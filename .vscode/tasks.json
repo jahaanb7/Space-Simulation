@@ -27,6 +27,7 @@
 				"CoreVideo",
 				"-framework",
 				"CoreFoundation",
+				"-Wno-deprecated"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
