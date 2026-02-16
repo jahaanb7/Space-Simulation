@@ -6,7 +6,7 @@
 			"label": "C/C++: clang build active file",
 			"command": "/usr/bin/clang",
 			"args": [
-				"-std=c++23",
+				"-std=c++17",
 				"-fcolor-diagnostics",
 				"-fansi-escape-codes",
 				"-Wall",
@@ -14,7 +14,8 @@
 				"-I${workspaceFolder}/dependencies/include",
 				"-L${workspaceFolder}/dependencies/library",
 				"${workspaceFolder}/*.cpp",
-				"-L${workspaceFolder}/dependencies/library/libglfw.3.4.dylib",
+				"-L${workspaceFolder}/dependencies/library",
+				"-lglfw",
 				"-o",
 				"${workspaceFolder}/app",
 				"-framework",
