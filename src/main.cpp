@@ -4,10 +4,16 @@
 #include <glm/glm.hpp> 
 #include <glm/gtc/constants.hpp>
 #include "library/Particle.h"
+#include <vector>
+#include <cmath>
+#include <stdio.h>
+#include <unistd.h>
 
 // screen size vars
 const float WIDTH = 800.0f;
 const float HEIGHT = 600.0f;
+
+float delayBetweenParticles = 0.1f;
 
 bool mouseMode = false; 
 
@@ -56,6 +62,15 @@ void boundingBoundary(Particle& particle){
     }
 }
 
+void drawParticleArray(std::vector<Particle>& particles, float deltaTime, float TimeDelay){
+
+    for(auto& p : particles) {        
+        p.updatePosition(deltaTime);
+        boundingBoundary(p);
+        p.drawParticle();
+    }
+}
+
 int main(void)
 {
     if (!glfwInit()){
@@ -84,38 +99,46 @@ int main(void)
     glLoadIdentity();
 
     //initialize Particle
-    glm::vec2 position(20.0f, 20.0f);
+    glm::vec2 position(400.0f, 20.0f);
 
     const float magnitude = 400.0f;
-    const float angleDegree = 90.0f;
+    const float angleDegree = 260.0f;
     const float angleRadians = glm::radians(angleDegree);
 
     float directionX = magnitude*(cos(angleRadians));
     float directionY = magnitude*(sin(angleRadians));
 
-    glm::vec2 velocity = glm::vec2(0, HEIGHT);
+    glm::vec2 velocity = glm::vec2(directionX, directionY);
 
-    const float mass = 60.0f;
-    const float radius = 20.0f;
+    const float mass = 300.0f;
+    const float radius = 10.0f;
+    int numParticles = 5;
 
-    Particle particle(position, velocity, mass, radius);
+    std::vector<Particle> particles;
+    std::vector<float> spawnTimes;
 
+    for(int i = 0; i < numParticles; i++){
+        particles.emplace_back(position, velocity, mass, radius);
+        spawnTimes.push_back(i * delayBetweenParticles); // each particle spawns after 0.1s
+    }
+    
+    float elapsedTime = 0.0f;
     float deltaTime = 0.0167f;
 
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        if(mouseMode){
-            mouseMovement(window, particle);
+        elapsedTime += deltaTime;
+
+        for(int i = 0; i < particles.size(); i++){
+            if(elapsedTime >= spawnTimes[i]){
+                glm::vec2 gravityAcceleration = particles[i].setGravityAcceleration(500,100,glm::vec2(WIDTH/2, 0));
+                particles[i].updatePosition(deltaTime);
+                boundingBoundary(particles[i]);
+                particles[i].drawParticle();
+            }
         }
-
-        boundingBoundary(particle);
-
-        glm::vec2 gravityAcceleration = particle.setGravityAcceleration(4000.0, 100.0, glm::vec2(WIDTH/2.0, HEIGHT/2.0));
-        particle.updatePositionGravity(deltaTime, gravityAcceleration);
-
-        particle.drawParticle();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

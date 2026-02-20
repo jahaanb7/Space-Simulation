@@ -8,7 +8,6 @@ class Particle{
     // additional vars
     float mass;
     float radius;
-    float charge;
     float damping = 0.995f;
 
     Particle(glm::vec2 pos, glm::vec2 vel, float m, float r)
